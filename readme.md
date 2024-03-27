@@ -104,5 +104,76 @@ inputs:
 ### make changes accrodingly in the `test.yaml files`
 
 ```
+name: "Hello there"
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          gh-token: ${{secrets.ACCESS_GITHUB_TOKEN}}
+          label: "needs-review"
+
+```
+
+### Raise a PR and the workflow will run but fails
+
+```
+Error: Cannot find module '@actions/core'
+```
+
+- Resolve it by using the as its expecting the `@actions/core` and the `@actions/github`
+- We can use the `@vercel/ncc` here ==> It will bundle everyting inside the index.js including our dependencies that we required.
+
+### What is @vercel/ncc ?
+
+```
+@vercel/ncc is a tool developed by Vercel, a cloud platform for deploying serverless functions and static websites. NCC stands for "Node.js Compiler Collection." It is used to compile Node.js projects into a single file, including all its dependencies. This can be particularly useful for creating distributable packages or optimizing the deployment of Node.js applications, especially in serverless environments where minimizing the size of deployed code can improve performance and reduce latency.
+```
+
+- Install it like as follows
+
+```
+npm install @vercel/ncc
+```
+
+- We need to make a change in the `package.json` for the `build scripts`
+
+```
+# Earlier
+"build": "tsc"
+
+# Now making change its about
+"build" : "tsc && ncc build lib/index.js"
+```
+
+- Also need to make the change into the `tsconfig.json` file here
+- Setting `outDir` back to the `lib`
+
+```
+Earlier from the
+"outDir": "dist",
+
+back to the
+"outDir": "lib"
+```
+
+- We are doing this beacuse the `ncc` will populate the `dist` folder.
+
+- Then Run the build Command like as follows
+
+```
+npm run build
+```
+
+- Now the dist/index.js will contain all the dependecies that will be needed throughout the project. WE do not need to push that so we ignore it in the .gitignore file
+
+```
 
 ```
