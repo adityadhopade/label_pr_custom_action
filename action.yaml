@@ -1,0 +1,6 @@
+name: "label new pull request"
+description: "Add a label when the new PR is opened."
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
