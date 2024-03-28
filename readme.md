@@ -350,7 +350,3 @@ npx husky-init && npm install
 - It will create a `pre-commit.sh` file; so taht every time someone commits it will run the test
 
 - We can further enhance it to run the `prettier` and fix linting issues using the `es-lint`
-
-```
-
-```
