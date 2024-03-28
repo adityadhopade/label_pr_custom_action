@@ -1,6 +1,19 @@
 name: "label new pull request"
 description: "Add a label when the new PR is opened."
+author: "Aditya Dhopade"
+
+inputs:
+  gh-token:
+    description: "The GitHub token for authentication."
+    required: true
+  label:
+    description: "The label to be applied to the pull request."
+    required: true
 
 runs:
   using: "node16"
   main: "dist/index.js"
+
+branding:
+  icon: "activity"
+  color: "green"

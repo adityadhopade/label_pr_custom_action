@@ -1,3 +1,67 @@
+- Firstly startoff with the `action.yaml` file
+
+```
+name: "PR Slack Integration"
+description: "Add PR Comment to Slack Integration"
+author: "Aditya Dhopade"
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
+
+```
+
+- Then start with initailising the Node Project
+
+```
+npm init
+
+With a custom script
+
+build: "tsc"
+
+# Install Typescript
+npm install -D typescript
+
+## To add tsconfig.json
+npx tsc --init
+```
+
+- Add the tsconfig.josn in the following as
+
+```
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+- Add `src` folder in that add `index.ts`
+
+```
+console.log("Hello there");
+```
+
+- Run the `index.ts` file we will get it as follows like
+
+```
+npm run build
+```
+
+- Add a .gitignore file
+
+```
+Ctrl + Shift + p ==> git ignore ==> NodeJS ==> Remove `Dist` from it
+As Dist Contains the index.js file
+```
+
 - Write the script in the Typescript for the github actions to work properly.
 
 - Do not include dist in the gitignore file (not in our usecase)
@@ -43,7 +107,7 @@ console.log(`Hello ${name}!`)
 
 ### Integrate with the GitHub inorder to add label to PR
 
-- install the `@actions/github` => official package from githu to interact with the GitHub API
+- install the `@actions/github` => official package from github to interact with the GitHub API
 
 ```
 npm install @actions/github
@@ -94,7 +158,7 @@ Octokit is a set of client libraries for the GitHub API, provided by GitHub itse
 ```
 inputs:
   gh-token:
-    description: 'Github Authentication token'
+    description: '  '
     required: true
   label:
     description: 'Label to be applied to the Pull Request'
