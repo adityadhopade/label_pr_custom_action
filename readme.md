@@ -350,3 +350,56 @@ npx husky-init && npm install
 - It will create a `pre-commit.sh` file; so taht every time someone commits it will run the test
 
 - We can further enhance it to run the `prettier` and fix linting issues using the `es-lint`
+
+- Install `prettier` and `eslint` and `lintstaged`
+
+```
+npm install -D prettier eslint lint-staged(it will make sure our lint rules gets applied to desired linting rule)
+```
+
+- some plugins as we are using the TS we need to install its types
+
+```
+npm install -D @typescript-eslint/eslint-plugin@latest eslint-plugin-jest@latest
+```
+
+- Add the files like `.eslintrc` , `.prettierrc`, `.lintstagedrc` in the root folder of the project
+
+- `.eslintrc` contains the following code
+
+```
+{
+  "plugins": ["jest", "@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "env": {
+    "node": true,
+    "jest/globals": true
+  },
+  "ignorePatterns": ["*.test.ts"]
+}
+```
+
+- `.prettierrc` configurations will look like this
+
+```
+{
+  "trailingComma": "es5",
+  "printWidth": 120,
+  "tabWidth": 2
+}
+```
+
+- `.lintstagedrc` configuration like
+
+```
+{
+  "./src/**/*.{js,ts}": ["prettier --write", "eslint --max-warnings 2"]
+}
+```
+
+- Further add in the `precommit.sh` for the lint-staged
+
+```
+npx lint-staged
+```
