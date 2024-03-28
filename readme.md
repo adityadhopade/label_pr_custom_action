@@ -131,6 +131,20 @@ Error: Cannot find module '@actions/core'
 - Resolve it by using the as its expecting the `@actions/core` and the `@actions/github`
 - We can use the `@vercel/ncc` here ==> It will bundle everyting inside the index.js including our dependencies that we required.
 
+### If we want to run the action locally
+
+- Using the `act` tool; we can run this action locally; without having to commit/push every time
+
+```
+npm install -g act
+```
+
+- Then you can run the action by executing `act`
+
+```
+act
+```
+
 ### What is @vercel/ncc ?
 
 ```
@@ -173,6 +187,169 @@ npm run build
 ```
 
 - Now the dist/index.js will contain all the dependecies that will be needed throughout the project. WE do not need to push that so we ignore it in the .gitignore file
+
+- Our workflow will also need permissions to read or write the Workflows so it will acts ==. make a change in the settings => Actions => general [Read and Write Permissions]
+
+- So now our workflow will run properly adding the label `needs-review` even though the label `needs-review` by default is not present; GitHub Actually creates a new label and add it to the set of default labels
+
+### We need to nmake sure that we are testing before pushing the code
+
+- We can make use of `JEST` as Testing framework here
+
+- Install JEST
+
+```
+npm install -D jest ts-jest @types/jest
+```
+
+- Add a file `jest.config.json`
+
+```
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "collectCoverage": true,
+  "coverageReporters": ["lcov", "text-summary"],
+  "collectCoverageFrom": ["src/**/*.ts"],
+  "coveragePathIgnorePatterns": ["/node_modules/", "/__tests__/"],
+  "testPathIgnorePatterns": ["/node_modules"]
+}
+```
+
+- USing Copilot Chat we acan generate the Unit Test cases for the application.
+
+### Writing Unit Test cases
+
+- Add `src/__tests__/index.test.ts` folder
+- Add the test command in the `package.json`
+
+```
+"test": "jest"
+```
+
+- Run the tests
+
+```
+npm run test
+```
+
+### Debugging the Action
+
+- Rather than using the `console.log` it can be better Debugged using some other methods for that
+
+- Install the package `ts-node` ==> Allows us to run our action directly from the source code.; without having to build it
+
+```
+npm install -D ts-node
+```
+
+- Configure the `.vscode/launch.json` ==> Configre the launch configuration
+
+```
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ts-node",
+      "type": "node",
+      "request": "launch",
+      "args": ["./src/index.ts"],
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}
+```
+
+- But for debugging it will still require the inputs which we have passed in the `test.yaml` which are `gh-token` and `label`
+
+- You can store them directly in the Launch Configuration as `environment variables`
+
+- It can get picked using the inbuilt function using @actions/core by `getInput`
+
+- Some Rules for it are as follows
+
+```
+- Prefix the name with the `INPUT_`
+- Name the Input in the Upper Case.
+```
+
+So Our Launch configuration would look like this (launch.json)
+
+```
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ts-node",
+      "type": "node",
+      "request": "launch",
+      "args": ["./src/index.ts"],
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "INPUT_GH-TOKEN": "secret-token-123456",
+        "INPUT_LABEL": "needs-review"
+      }
+    }
+  ]
+}
+```
+
+- What if we do `npm run build` then it will include the test in our build we do not want that.
+
+- Make some chanegs in the `ts-config.json`
+
+```
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "outDir": "lib",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules","**/*.test.ts"]
+}
+```
+
+- Now we can observe that the `run()` executes twice ; when the action is actually imported in the`index.ts`
+
+- we can modify it add a wrapper so when the actions is NOT run by JEST then only Run
+
+- Using the `JEST_WORKER_ID` we can get if the action is actully runned by the `JEST`
+
+```
+if (!process.env.JEST_WORKER_ID) {
+  run();
+}
+```
+
+## Setting up a precommit
+
+- When adding up a change; in order to actually obey the action we need to run the command
+
+```
+npm run build
+```
+
+- For that we can make use of the `Husky` which is a pre-commit action
+
+- So that every time we commit the action is again rebuilt
+
+- Install Husky
+
+```
+npx husky-init && npm install
+```
+
+- It will create a `pre-commit.sh` file; so taht every time someone commits it will run the test
+
+- We can further enhance it to run the `prettier` and fix linting issues using the `es-lint`
 
 ```
 
