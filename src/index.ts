@@ -7,6 +7,9 @@ export async function run() {
   const token = getInput("gh-token");
   const label = getInput("label");
 
+  console.log("token");
+  console.log("label");
+
   // to fetch the token
   const octokit = getOctokit(token);
   const pullRequest = context.payload.pull_request;
